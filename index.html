@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>公主的专属盲盒</title>
+    <style>
+        /* 基础与背景设置 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #ffafbd 0%, #ffc3a0 100%);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 漂浮爱心粒子特效 */
+        .heart-particle {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.4);
+            bottom: -10%;
+            animation: floatUp linear infinite;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0.8); opacity: 0; }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.4; }
+            100% { transform: translateY(-120vh) scale(1.5); opacity: 0; }
+        }
+
+        /* 屏幕容器 */
+        .screen {
+            position: absolute;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            z-index: 10;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .screen.hidden {
+            opacity: 0;
+            transform: scale(0.9);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* 文字排版 */
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-shadow: 0 4px 10px rgba(255, 105, 135, 0.6);
+            margin-bottom: 40px;
+            line-height: 1.4;
+        }
+
+        p.guide-text {
+            font-size: 16px;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 5px rgba(255, 105, 135, 0.4);
+        }
+
+        /* 发光按钮 */
+        .btn {
+            background: #fff;
+            color: #ff758c;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 40px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 175, 189, 0.5);
+            animation: pulseGlow 2s infinite alternate;
+            transition: transform 0.1s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(255,175,189,0.5); }
+            100% { box-shadow: 0 0 20px rgba(255,255,255,1), 0 0 40px rgba(255,117,140,0.8); }
+        }
+
+        /* 盲盒UI与动画 */
+        .box-container {
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 40px;
+            background: radial-gradient(circle at 30% 30%, #fff0f3, #ffb6c1);
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(255, 105, 135, 0.4), inset 0 -5px 15px rgba(255, 255, 255, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 80px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .box-container::after {
+            content: '?';
+            color: #ff758c;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+            text-shadow: 2px 2px 0px #fff;
+        }
+
+        .shake {
+            animation: shakeBox 0.4s infinite;
+        }
+
+        @keyframes shakeBox {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-5deg); }
+            20% { transform: translate(-3px, 0px) rotate(5deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(5deg); }
+            50% { transform: translate(-1px, 2px) rotate(-5deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-5deg); }
+            80% { transform: translate(-1px, -1px) rotate(5deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-5deg); }
+        }
+
+        /* 礼物展示区 */
+        .gift-icon-container {
+            font-size: 100px;
+            margin-bottom: 20px;
+            animation: popUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15));
+        }
+
+        .gift-title {
+            font-size: 24px;
+            color: #ff477e;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            display: inline-block;
+            box-shadow: 0 8px 20px rgba(255, 105, 135, 0.3);
+            animation: slideUp 0.8s ease forwards;
+            animation-delay: 0.2s;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .gift-desc {
+            font-size: 14px;
+            color: #fff;
+            margin-top: 15px;
+            opacity: 0;
+            animation: fadeIn 1s ease forwards;
+            animation-delay: 0.6s;
+        }
+
+        @keyframes popUp {
+            0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* 庆祝纸屑特效 */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            top: -20px;
+            z-index: 100;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(110vh) rotate(720deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="screen-intro" class="screen">
+        <h1>公主请选择<br>你的礼物盲盒</h1>
+        <button class="btn" onclick="goToMachine()">点击进入 ✨</button>
+    </div>
+
+    <div id="screen-machine" class="screen hidden">
+        <p class="guide-text">点击摇杆或按钮<br>开始抽取你的幸运盲盒</p>
+        <div id="blind-box" class="box-container"></div>
+        <button id="draw-btn" class="btn" onclick="startDraw()">开始抽取 🎁</button>
+    </div>
+
+    <div id="screen-result" class="screen hidden">
+        <h1 style="margin-bottom: 20px;">🎉 恭喜你抽中 🎉</h1>
+        <div id="gift-display" class="gift-icon-container"></div>
+        <div id="gift-name" class="gift-title"></div>
+        <div id="gift-desc" class="gift-desc">这份小惊喜，希望你能喜欢~</div>
+    </div>
+
+    <script>
+        // 礼物奖池配置 (使用精美Emoji作为占位图)
+        const gifts = [
+            { id: 1, name: "雅诗兰黛小棕瓶", icon: "🤎", desc: "定格年轻，守护你的每一寸肌肤" },
+            { id: 2, name: "恶魔之眼项链", icon: "🧿", desc: "把好运和偏爱，都挂在你的心上" },
+            { id: 3, name: "海蓝之谜面霜", icon: "🌊", desc: "顶级修护，只给最珍贵的你" },
+            { id: 4, name: "蔻驰经典包包", icon: "👜", desc: "装下浪漫，陪你走遍星辰大海" },
+            { id: 5, name: "大牌高定口红", icon: "💄", desc: "一抹倾心，点亮你的专属气场" }
+        ];
+
+        // 背景生成飘落的爱心
+        function createHearts() {
+            const container = document.body;
+            for (let i = 0; i < 20; i++) {
+                let heart = document.createElement('div');
+                heart.className = 'heart-particle';
+                heart.innerHTML = '❤';
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.fontSize = (Math.random() * 15 + 10) + 'px';
+                heart.style.animationDuration = (Math.random() * 5 + 4) + 's';
+                heart.style.animationDelay = (Math.random() * 5) + 's';
+                container.appendChild(heart);
+            }
+        }
+        createHearts();
+
+        // 切换到娃娃机页面
+        function goToMachine() {
+            document.getElementById('screen-intro').classList.add('hidden');
+            setTimeout(() => {
+                document.getElementById('screen-machine').classList.remove('hidden');
+            }, 500);
+        }
+
+        // 开始抽取逻辑
+        function startDraw() {
+            const box = document.getElementById('blind-box');
+            const btn = document.getElementById('draw-btn');
+            
+            // 防止重复点击
+            btn.disabled = true;
+            btn.innerText = "抽取中...";
+            btn.style.opacity = "0.7";
+
+            // 增加震动动画
+            box.classList.add('shake');
+
+            // 模拟抽取过程 (持续2.5秒)
+            setTimeout(() => {
+                box.classList.remove('shake');
+                showResult();
+            }, 2500);
+        }
+
+        // 展示结果
+        function showResult() {
+            // 随机抽取一个礼物
+            const randomIndex = Math.floor(Math.random() * gifts.length);
+            const selectedGift = gifts[randomIndex];
+
+            // 填充礼物信息
+            document.getElementById('gift-display').innerText = selectedGift.icon;
+            document.getElementById('gift-name').innerText = selectedGift.name;
+            document.getElementById('gift-desc').innerText = selectedGift.desc;
+
+            // 切换屏幕
+            document.getElementById('screen-machine').classList.add('hidden');
+            setTimeout(() => {
+                document.getElementById('screen-result').classList.remove('hidden');
+                triggerConfetti(); // 触发撒花特效
+            }, 500);
+        }
+
+        // 撒花庆祝特效
+        function triggerConfetti() {
+            const colors = ['#ff718d', '#fdff6a', '#7afcff', '#ffb0f4', '#ffffff'];
+            for (let i = 0; i < 80; i++) {
+                let confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                // 随机形状 (正方形或长条)
+                if (Math.random() > 0.5) {
+                    confetti.style.width = '6px';
+                    confetti.style.height = '15px';
+                }
+                
+                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                document.body.appendChild(confetti);
+                
+                // 动画结束后清理DOM
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>
