@@ -3,320 +3,283 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>公主的专属盲盒</title>
+    <title>公主的专属礼物</title>
     <style>
-        /* 基础与背景设置 */
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, #ffafbd 0%, #ffc3a0 100%);
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+        /* ================= 基础重置 ================= */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        body, html { width: 100%; height: 100%; overflow: hidden; font-family: 'PingFang SC', sans-serif; background: linear-gradient(135deg, #ffafbd 0%, #ffc3a0 100%); color: #fff; }
 
-        /* 漂浮爱心粒子特效 */
-        .heart-particle {
-            position: absolute;
-            color: rgba(255, 255, 255, 0.4);
-            bottom: -10%;
-            animation: floatUp linear infinite;
-            z-index: 1;
-            pointer-events: none;
-        }
+        /* 背景装饰粒子 */
+        #bg-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        .heart-particle { position: absolute; opacity: 0; animation: floatUp linear infinite; }
+        @keyframes floatUp { 0% { transform: translateY(100vh) scale(0.6) rotate(0deg); opacity: 0; } 20% { opacity: 0.7; } 100% { transform: translateY(-10vh) scale(1.2) rotate(45deg); opacity: 0; } }
 
-        @keyframes floatUp {
-            0% { transform: translateY(0) scale(0.8); opacity: 0; }
-            20% { opacity: 0.6; }
-            80% { opacity: 0.4; }
-            100% { transform: translateY(-120vh) scale(1.5); opacity: 0; }
-        }
+        /* 屏幕切换逻辑 */
+        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; transition: opacity 0.8s ease, transform 0.8s ease; }
+        .fade-out { opacity: 0; transform: scale(1.05); pointer-events: none; z-index: -1; }
+        .fade-in { opacity: 1; transform: scale(1); z-index: 10; }
 
-        /* 屏幕容器 */
-        .screen {
-            position: absolute;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            z-index: 10;
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            opacity: 1;
-            transform: scale(1);
-        }
+        .glass-panel { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 24px; box-shadow: 0 10px 40px rgba(255, 105, 135, 0.2); text-align: center; }
 
-        .screen.hidden {
-            opacity: 0;
-            transform: scale(0.9);
-            pointer-events: none;
-            z-index: -1;
-        }
+        /* 按钮样式 */
+        .btn { background: #fff; color: #ff6b8b; border: none; padding: 16px 36px; border-radius: 40px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 5px 20px rgba(255,255,255,0.5); transition: 0.3s; outline: none; }
+        .btn:active { transform: scale(0.92); }
 
-        /* 文字排版 */
-        h1 {
-            font-size: 28px;
-            font-weight: 600;
-            letter-spacing: 2px;
-            text-shadow: 0 4px 10px rgba(255, 105, 135, 0.6);
-            margin-bottom: 40px;
-            line-height: 1.4;
-        }
-
-        p.guide-text {
-            font-size: 16px;
-            margin-bottom: 30px;
-            text-shadow: 0 2px 5px rgba(255, 105, 135, 0.4);
-        }
-
-        /* 发光按钮 */
-        .btn {
-            background: #fff;
-            color: #ff758c;
-            border: none;
-            padding: 16px 40px;
-            border-radius: 40px;
-            font-size: 18px;
-            font-weight: bold;
+        /* ================= 核心：2D 扁平化盲盒 ================= */
+        .flat-box-stage {
+            width: 200px; height: 220px;
+            margin-bottom: 60px;
             cursor: pointer;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 175, 189, 0.5);
-            animation: pulseGlow 2s infinite alternate;
-            transition: transform 0.1s;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .btn:active {
-            transform: scale(0.95);
-        }
-
-        @keyframes pulseGlow {
-            0% { box-shadow: 0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(255,175,189,0.5); }
-            100% { box-shadow: 0 0 20px rgba(255,255,255,1), 0 0 40px rgba(255,117,140,0.8); }
-        }
-
-        /* 盲盒UI与动画 */
-        .box-container {
-            width: 160px;
-            height: 160px;
-            margin: 0 auto 40px;
-            background: radial-gradient(circle at 30% 30%, #fff0f3, #ffb6c1);
-            border-radius: 25px;
-            box-shadow: 0 15px 35px rgba(255, 105, 135, 0.4), inset 0 -5px 15px rgba(255, 255, 255, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 80px;
             position: relative;
-            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
         }
 
-        .box-container::after {
-            content: '?';
-            color: #ff758c;
-            font-weight: bold;
-            font-family: Arial, sans-serif;
-            text-shadow: 2px 2px 0px #fff;
+        .flat-box {
+            position: relative;
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
         }
 
-        .shake {
-            animation: shakeBox 0.4s infinite;
+        /* 盒子悬浮动画 */
+        .flat-box-float { animation: flatBoxFloat 3s ease-in-out infinite; }
+        @keyframes flatBoxFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
         }
 
-        @keyframes shakeBox {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-5deg); }
-            20% { transform: translate(-3px, 0px) rotate(5deg); }
-            30% { transform: translate(3px, 2px) rotate(0deg); }
-            40% { transform: translate(1px, -1px) rotate(5deg); }
-            50% { transform: translate(-1px, 2px) rotate(-5deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(3px, 1px) rotate(-5deg); }
-            80% { transform: translate(-1px, -1px) rotate(5deg); }
-            90% { transform: translate(1px, 2px) rotate(0deg); }
-            100% { transform: translate(1px, -2px) rotate(-5deg); }
+        /* 盒子主体 */
+        .box-base {
+            position: relative;
+            width: 170px; height: 150px;
+            background: linear-gradient(135deg, #ffc0cb, #ffb6c1);
+            border: 3px solid #fff;
+            border-radius: 8px 8px 15px 15px;
+            box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.6), 0 10px 20px rgba(255, 105, 135, 0.3);
+            overflow: hidden;
+            z-index: 2;
         }
 
-        /* 礼物展示区 */
-        .gift-icon-container {
-            font-size: 100px;
-            margin-bottom: 20px;
-            animation: popUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15));
-        }
-
-        .gift-title {
-            font-size: 24px;
-            color: #ff477e;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 12px 30px;
-            border-radius: 30px;
-            font-weight: bold;
-            display: inline-block;
-            box-shadow: 0 8px 20px rgba(255, 105, 135, 0.3);
-            animation: slideUp 0.8s ease forwards;
-            animation-delay: 0.2s;
-            opacity: 0;
-            transform: translateY(20px);
-        }
-
-        .gift-desc {
-            font-size: 14px;
-            color: #fff;
-            margin-top: 15px;
-            opacity: 0;
-            animation: fadeIn 1s ease forwards;
-            animation-delay: 0.6s;
-        }
-
-        @keyframes popUp {
-            0% { transform: scale(0) rotate(-20deg); opacity: 0; }
-            100% { transform: scale(1) rotate(0deg); opacity: 1; }
-        }
-
-        @keyframes slideUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeIn {
-            to { opacity: 1; }
-        }
-
-        /* 庆祝纸屑特效 */
-        .confetti {
+        /* 盒盖 */
+        .box-lid {
             position: absolute;
-            width: 10px;
-            height: 10px;
-            top: -20px;
-            z-index: 100;
-            animation: fall linear forwards;
+            top: 25px;
+            width: 190px; height: 45px;
+            background: linear-gradient(135deg, #ffe4e8, #ffc0cb);
+            border: 3px solid #fff;
+            border-radius: 10px;
+            box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.8), 0 6px 15px rgba(255, 105, 135, 0.4);
+            z-index: 10;
+            display: flex; justify-content: center;
         }
 
-        @keyframes fall {
-            to { transform: translateY(110vh) rotate(720deg); }
+        /* 顶部的蝴蝶结 */
+        .bow {
+            position: absolute;
+            top: -22px; left: 50%; transform: translateX(-50%);
+            width: 60px; height: 30px;
+            z-index: 11;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        .bow::before, .bow::after {
+            content: ''; position: absolute;
+            width: 35px; height: 25px;
+            background: #ff477e;
+            border-radius: 50% 50% 10% 50%;
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.1);
+        }
+        .bow::before { left: -10px; transform: rotate(-15deg); }
+        .bow::after { right: -10px; border-radius: 50% 50% 50% 10%; transform: rotate(15deg); }
+        .bow-center {
+            position: absolute; top: 3px; left: 50%; transform: translateX(-50%);
+            width: 14px; height: 14px; background: #fff; border-radius: 50%; z-index: 12;
+            box-shadow: 0 0 5px rgba(255,71,126,0.5);
+        }
+
+        /* 飘带样式 */
+        .ribbon-v, .ribbon-h {
+            position: absolute; background: #ff477e;
+            box-shadow: 0 0 8px rgba(255, 71, 126, 0.3);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .box-base .ribbon-v { width: 30px; height: 100%; left: 67px; top: 0; }
+        .box-base .ribbon-h { width: 100%; height: 30px; top: 60px; left: 0; }
+        .box-lid .ribbon-v { width: 30px; height: 100%; left: 77px; top: 0; }
+
+        /* 丝带解开动画 */
+        .ribbon-unfold-v { transform: scaleY(0); opacity: 0; }
+        .ribbon-unfold-h { transform: scaleX(0); opacity: 0; }
+        .bow-unfold { transform: translateX(-50%) scale(0); opacity: 0; }
+
+        /* 盒盖飞起 */
+        .lid-open { animation: lidOpen2D 1s forwards 0.4s cubic-bezier(0.15, 0.85, 0.35, 1); }
+        @keyframes lidOpen2D {
+            100% { transform: translateY(-120px) rotate(-10deg) scale(0.9); opacity: 0; }
+        }
+
+        /* 内部光芒 */
+        .inner-light {
+            position: absolute; width: 20px; height: 20px;
+            top: 100px; left: 90px;
+            background: #fff; border-radius: 50%;
+            box-shadow: 0 0 80px 60px #fff, 0 0 150px 100px #ffe4e8;
+            opacity: 0; transition: opacity 0.5s 0.6s;
+            z-index: 5; pointer-events: none;
+        }
+
+        /* ================= 结果展示 ================= */
+        .cute-frame {
+            position: relative; padding: 15px; background: rgba(255, 255, 255, 0.4);
+            border: 4px solid #fff; border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(255, 105, 135, 0.3);
+            margin-bottom: 25px;
+            opacity: 0; transform: scale(0.5); transition: 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .cute-frame::before { content: '💖'; position: absolute; top: -15px; left: -15px; font-size: 30px; }
+        .cute-frame::after { content: '💖'; position: absolute; bottom: -15px; right: -15px; font-size: 30px; }
+        .gift-img { width: 230px; height: 230px; object-fit: contain; background: #fff; border-radius: 20px; }
+        
+        .show-result .cute-frame { opacity: 1; transform: scale(1); }
+        .gift-name { font-size: 26px; font-weight: bold; color: #ff477e; margin-bottom: 10px; }
+        .gift-desc { font-size: 15px; line-height: 1.6; padding: 0 30px; font-weight: bold; }
+
+        /* 弹窗 */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,175,189,0.5); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.4s; z-index: 100; }
+        .overlay.active { opacity: 1; pointer-events: auto; }
     </style>
 </head>
 <body>
 
-    <div id="screen-intro" class="screen">
-        <h1>公主请选择<br>你的礼物盲盒</h1>
-        <button class="btn" onclick="goToMachine()">点击进入 ✨</button>
+    <div id="bg-container"></div>
+
+    <div id="phase1" class="screen">
+        <div class="glass-panel" style="padding: 50px 30px; width: 85%;">
+            <h1 style="margin-bottom:40px; font-family:serif;">公主请开启<br>你的专属礼物</h1>
+            <button class="btn" onclick="goPhase2()">进入抽奖 ✨</button>
+        </div>
     </div>
 
-    <div id="screen-machine" class="screen hidden">
-        <p class="guide-text">点击摇杆或按钮<br>开始抽取你的幸运盲盒</p>
-        <div id="blind-box" class="box-container"></div>
-        <button id="draw-btn" class="btn" onclick="startDraw()">开始抽取 🎁</button>
+    <div id="phase2" class="screen fade-out">
+        <div style="font-size: 18px; margin-bottom: 40px; font-weight: bold;">点击解开丝带，开启惊喜</div>
+        
+        <div class="flat-box-stage" onclick="openBox()">
+            <div id="flat-box" class="flat-box flat-box-float">
+                <div id="lid" class="box-lid">
+                    <div id="bow" class="bow"><div class="bow-center"></div></div>
+                    <div class="ribbon-v"></div>
+                </div>
+                <div class="box-base">
+                    <div class="ribbon-v"></div>
+                    <div class="ribbon-h"></div>
+                </div>
+                <div class="inner-light" id="inner-light"></div>
+            </div>
+        </div>
+
+        <button id="openBtn" class="btn" onclick="openBox()">✨ 开启惊喜</button>
     </div>
 
-    <div id="screen-result" class="screen hidden">
-        <h1 style="margin-bottom: 20px;">🎉 恭喜你抽中 🎉</h1>
-        <div id="gift-display" class="gift-icon-container"></div>
-        <div id="gift-name" class="gift-title"></div>
-        <div id="gift-desc" class="gift-desc">这份小惊喜，希望你能喜欢~</div>
+    <div id="phase3" class="screen fade-out">
+        <div id="result-ui" style="text-align: center;">
+            <div class="cute-frame">
+                <img id="gift-img" class="gift-img" src="" alt="礼物">
+            </div>
+            <div id="gift-name" class="gift-name"></div>
+            <div id="gift-desc" class="gift-desc"></div>
+            
+            <div style="margin-top: 40px; display: flex; flex-direction: column; align-items: center; gap: 15px;">
+                <button class="btn" onclick="showPopup()">🎁 立即领取</button>
+                <div style="font-size: 13px; text-decoration: underline; cursor: pointer;" onclick="retry()">不喜欢？重抽一次</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="popup-overlay" class="overlay">
+        <div class="glass-panel" style="padding: 40px 25px; width: 85%;">
+            <h2 style="color:#ff477e; margin-bottom:15px;">请联系亲爱的老公<br>领取实物哦！💕</h2>
+            <p style="font-size:13px; color:#ff8fa3; margin-bottom:25px; border-top:1px solid #ffe4e8; padding-top:15px;">
+                备注：可多次抽取。若无心仪之选，请即刻召唤老公更新礼物池。
+            </p>
+            <button class="btn" style="width: 100%;" onclick="closePopup()">爱你 😘</button>
+        </div>
     </div>
 
     <script>
-        // 礼物奖池配置 (使用精美Emoji作为占位图)
         const gifts = [
-            { id: 1, name: "雅诗兰黛小棕瓶", icon: "🤎", desc: "定格年轻，守护你的每一寸肌肤" },
-            { id: 2, name: "恶魔之眼项链", icon: "🧿", desc: "把好运和偏爱，都挂在你的心上" },
-            { id: 3, name: "海蓝之谜面霜", icon: "🌊", desc: "顶级修护，只给最珍贵的你" },
-            { id: 4, name: "蔻驰经典包包", icon: "👜", desc: "装下浪漫，陪你走遍星辰大海" },
-            { id: 5, name: "大牌高定口红", icon: "💄", desc: "一抹倾心，点亮你的专属气场" }
+            { name: "雅诗兰黛小棕瓶", image: "https://i.ibb.co.com/9mCy6PCX/image.jpg", desc: "“想把全世界最好的守护都给你，愿你的美由我来温柔定格。”" },
+            { name: "恶魔之眼项链", image: "https://i.ibb.co.com/PvY0YLC0/image.jpg", desc: "“它是好运的象征，也是我的目光，想一生一世守护在你的心上。”" },
+            { name: "海蓝之谜精粹水", image: "https://i.ibb.co.com/BKBd3zJY/image.jpg", desc: "“想给你的爱，像海洋般深邃纯净，为你修护生活里所有的疲惫。”" },
+            { name: "蔻驰经典包包", image: "https://i.ibb.co.com/5gf1HbKv/image.jpg", desc: "“想陪你走遍星辰大海，把所有的浪漫和余生，都装进这里。”" },
+            { name: "圣罗兰口红", image: "https://i.ibb.co.com/Q74SYczH/image.jpg", desc: "“你是我的唯一女主角，想用这抹红，点亮你所有的灿烂瞬间。”" }
         ];
 
-        // 背景生成飘落的爱心
-        function createHearts() {
-            const container = document.body;
+        let isOpening = false;
+
+        function initBg() {
+            const container = document.getElementById('bg-container');
+            const icons = ['🌸','✨','💖'];
             for (let i = 0; i < 20; i++) {
-                let heart = document.createElement('div');
-                heart.className = 'heart-particle';
-                heart.innerHTML = '❤';
-                heart.style.left = Math.random() * 100 + 'vw';
-                heart.style.fontSize = (Math.random() * 15 + 10) + 'px';
-                heart.style.animationDuration = (Math.random() * 5 + 4) + 's';
-                heart.style.animationDelay = (Math.random() * 5) + 's';
-                container.appendChild(heart);
+                let p = document.createElement('div');
+                p.className = 'heart-particle';
+                p.innerText = icons[Math.floor(Math.random()*3)];
+                p.style.left = Math.random() * 100 + 'vw';
+                p.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                container.appendChild(p);
             }
         }
-        createHearts();
+        initBg();
 
-        // 切换到娃娃机页面
-        function goToMachine() {
-            document.getElementById('screen-intro').classList.add('hidden');
-            setTimeout(() => {
-                document.getElementById('screen-machine').classList.remove('hidden');
-            }, 500);
+        function goPhase2() {
+            document.getElementById('phase1').classList.add('fade-out');
+            document.getElementById('phase2').classList.remove('fade-out');
         }
 
-        // 开始抽取逻辑
-        function startDraw() {
-            const box = document.getElementById('blind-box');
-            const btn = document.getElementById('draw-btn');
+        function openBox() {
+            if(isOpening) return;
+            isOpening = true;
             
-            // 防止重复点击
-            btn.disabled = true;
-            btn.innerText = "抽取中...";
-            btn.style.opacity = "0.7";
+            const box = document.getElementById('flat-box');
+            const lid = document.getElementById('lid');
+            const bow = document.getElementById('bow');
+            const ribbonsV = document.querySelectorAll('.ribbon-v');
+            const ribbonsH = document.querySelectorAll('.ribbon-h');
+            const light = document.getElementById('inner-light');
 
-            // 增加震动动画
-            box.classList.add('shake');
+            box.classList.remove('flat-box-float');
+            document.getElementById('openBtn').innerText = "丝带解开中...";
 
-            // 模拟抽取过程 (持续2.5秒)
+            // 1. 丝带和蝴蝶结平滑解开/消失
+            ribbonsV.forEach(r => r.classList.add('ribbon-unfold-v'));
+            ribbonsH.forEach(r => r.classList.add('ribbon-unfold-h'));
+            bow.classList.add('bow-unfold');
+
+            // 2. 盒盖飞起，光芒亮起
+            lid.classList.add('lid-open');
+            light.style.opacity = "1";
+
+            // 3. 展现结果
             setTimeout(() => {
-                box.classList.remove('shake');
-                showResult();
-            }, 2500);
-        }
-
-        // 展示结果
-        function showResult() {
-            // 随机抽取一个礼物
-            const randomIndex = Math.floor(Math.random() * gifts.length);
-            const selectedGift = gifts[randomIndex];
-
-            // 填充礼物信息
-            document.getElementById('gift-display').innerText = selectedGift.icon;
-            document.getElementById('gift-name').innerText = selectedGift.name;
-            document.getElementById('gift-desc').innerText = selectedGift.desc;
-
-            // 切换屏幕
-            document.getElementById('screen-machine').classList.add('hidden');
-            setTimeout(() => {
-                document.getElementById('screen-result').classList.remove('hidden');
-                triggerConfetti(); // 触发撒花特效
-            }, 500);
-        }
-
-        // 撒花庆祝特效
-        function triggerConfetti() {
-            const colors = ['#ff718d', '#fdff6a', '#7afcff', '#ffb0f4', '#ffffff'];
-            for (let i = 0; i < 80; i++) {
-                let confetti = document.createElement('div');
-                confetti.className = 'confetti';
-                confetti.style.left = Math.random() * 100 + 'vw';
-                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                const gift = gifts[Math.floor(Math.random()*gifts.length)];
+                const img = document.getElementById('gift-img');
+                img.src = gift.image;
                 
-                // 随机形状 (正方形或长条)
-                if (Math.random() > 0.5) {
-                    confetti.style.width = '6px';
-                    confetti.style.height = '15px';
+                img.onload = () => {
+                    document.getElementById('gift-name').innerText = gift.name;
+                    document.getElementById('gift-desc').innerText = gift.desc;
+                    document.getElementById('phase2').classList.add('fade-out');
+                    document.getElementById('phase3').classList.remove('fade-out');
+                    setTimeout(() => { document.getElementById('result-ui').classList.add('show-result'); }, 200);
                 }
-                
-                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
-                confetti.style.animationDelay = Math.random() * 0.5 + 's';
-                document.body.appendChild(confetti);
-                
-                // 动画结束后清理DOM
-                setTimeout(() => {
-                    confetti.remove();
-                }, 5000);
-            }
+            }, 1500);
         }
+
+        function retry() {
+            location.reload(); 
+        }
+
+        function showPopup() { document.getElementById('popup-overlay').classList.add('active'); }
+        function closePopup() { document.getElementById('popup-overlay').classList.remove('active'); }
     </script>
 </body>
 </html>
