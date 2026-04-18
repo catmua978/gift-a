@@ -22,13 +22,13 @@
         .glass-panel { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 24px; box-shadow: 0 10px 40px rgba(255, 105, 135, 0.2); text-align: center; }
 
         /* 按钮样式 */
-        .btn { background: #fff; color: #ff6b8b; border: none; padding: 16px 36px; border-radius: 40px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 5px 20px rgba(255,255,255,0.5); transition: 0.3s; outline: none; }
+        .btn { background: #fff; color: #ff6b8b; border: none; padding: 14px 30px; border-radius: 40px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 5px 20px rgba(255,255,255,0.5); transition: 0.3s; outline: none; }
         .btn:active { transform: scale(0.92); }
 
         /* ================= 核心：2D 扁平化盲盒 ================= */
         .flat-box-stage {
-            width: 200px; height: 220px;
-            margin-bottom: 60px;
+            width: 160px; height: 180px;
+            margin-bottom: 30px;
             cursor: pointer;
             position: relative;
             display: flex;
@@ -42,109 +42,111 @@
             display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
         }
 
-        /* 盒子悬浮动画 */
         .flat-box-float { animation: flatBoxFloat 3s ease-in-out infinite; }
         @keyframes flatBoxFloat {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
+            50% { transform: translateY(-12px); }
         }
 
-        /* 盒子主体 */
         .box-base {
             position: relative;
-            width: 170px; height: 150px;
+            width: 140px; height: 120px;
             background: linear-gradient(135deg, #ffc0cb, #ffb6c1);
             border: 3px solid #fff;
             border-radius: 8px 8px 15px 15px;
-            box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.6), 0 10px 20px rgba(255, 105, 135, 0.3);
+            box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.6), 0 8px 15px rgba(255, 105, 135, 0.3);
             overflow: hidden;
             z-index: 2;
         }
 
-        /* 盒盖 */
         .box-lid {
             position: absolute;
-            top: 25px;
-            width: 190px; height: 45px;
+            top: 40px;
+            width: 155px; height: 35px;
             background: linear-gradient(135deg, #ffe4e8, #ffc0cb);
             border: 3px solid #fff;
             border-radius: 10px;
-            box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.8), 0 6px 15px rgba(255, 105, 135, 0.4);
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.8), 0 5px 12px rgba(255, 105, 135, 0.4);
             z-index: 10;
             display: flex; justify-content: center;
         }
 
-        /* 顶部的蝴蝶结 */
         .bow {
             position: absolute;
-            top: -22px; left: 50%; transform: translateX(-50%);
-            width: 60px; height: 30px;
+            top: -18px; left: 50%; transform: translateX(-50%);
+            width: 44px; height: 22px;
             z-index: 11;
             transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .bow::before, .bow::after {
             content: ''; position: absolute;
-            width: 35px; height: 25px;
+            width: 26px; height: 18px;
             background: #ff477e;
             border-radius: 50% 50% 10% 50%;
-            box-shadow: inset 0 0 8px rgba(0,0,0,0.1);
         }
-        .bow::before { left: -10px; transform: rotate(-15deg); }
-        .bow::after { right: -10px; border-radius: 50% 50% 50% 10%; transform: rotate(15deg); }
+        .bow::before { left: -6px; transform: rotate(-15deg); }
+        .bow::after { right: -6px; border-radius: 50% 50% 50% 10%; transform: rotate(15deg); }
         .bow-center {
             position: absolute; top: 3px; left: 50%; transform: translateX(-50%);
-            width: 14px; height: 14px; background: #fff; border-radius: 50%; z-index: 12;
-            box-shadow: 0 0 5px rgba(255,71,126,0.5);
+            width: 10px; height: 10px; background: #fff; border-radius: 50%; z-index: 12;
         }
 
-        /* 飘带样式 */
         .ribbon-v, .ribbon-h {
             position: absolute; background: #ff477e;
-            box-shadow: 0 0 8px rgba(255, 71, 126, 0.3);
             transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .box-base .ribbon-v { width: 30px; height: 100%; left: 67px; top: 0; }
-        .box-base .ribbon-h { width: 100%; height: 30px; top: 60px; left: 0; }
-        .box-lid .ribbon-v { width: 30px; height: 100%; left: 77px; top: 0; }
+        .box-base .ribbon-v { width: 22px; height: 100%; left: 57px; top: 0; }
+        .box-base .ribbon-h { width: 100%; height: 22px; top: 45px; left: 0; }
+        .box-lid .ribbon-v { width: 22px; height: 100%; left: 65px; top: 0; }
 
-        /* 丝带解开动画 */
         .ribbon-unfold-v { transform: scaleY(0); opacity: 0; }
         .ribbon-unfold-h { transform: scaleX(0); opacity: 0; }
         .bow-unfold { transform: translateX(-50%) scale(0); opacity: 0; }
 
-        /* 盒盖飞起 */
         .lid-open { animation: lidOpen2D 1s forwards 0.4s cubic-bezier(0.15, 0.85, 0.35, 1); }
         @keyframes lidOpen2D {
-            100% { transform: translateY(-120px) rotate(-10deg) scale(0.9); opacity: 0; }
+            100% { transform: translateY(-100px) rotate(-10deg) scale(0.8); opacity: 0; }
         }
 
-        /* 内部光芒 */
         .inner-light {
-            position: absolute; width: 20px; height: 20px;
-            top: 100px; left: 90px;
+            position: absolute; width: 15px; height: 15px;
+            top: 90px; left: 70px;
             background: #fff; border-radius: 50%;
-            box-shadow: 0 0 80px 60px #fff, 0 0 150px 100px #ffe4e8;
+            box-shadow: 0 0 60px 40px #fff, 0 0 120px 80px #ffe4e8;
             opacity: 0; transition: opacity 0.5s 0.6s;
             z-index: 5; pointer-events: none;
         }
 
-        /* ================= 结果展示 ================= */
+        /* ================= 结果展示 (已调小爱心外框) ================= */
         .cute-frame {
-            position: relative; padding: 15px; background: rgba(255, 255, 255, 0.4);
-            border: 4px solid #fff; border-radius: 30px;
-            box-shadow: 0 15px 35px rgba(255, 105, 135, 0.3);
-            margin-bottom: 25px;
+            position: relative; 
+            padding: 10px;            /* 内部间距缩小 */
+            background: rgba(255, 255, 255, 0.4);
+            border: 3px solid #fff;   /* 边框变细一点点 */
+            border-radius: 20px;      /* 圆角调小 */
+            box-shadow: 0 10px 25px rgba(255, 105, 135, 0.25);
+            margin-bottom: 15px;      /* 底部间距缩小 */
+            max-width: 220px;         /* 强制限制外框最大宽度 */
             opacity: 0; transform: scale(0.5); transition: 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .cute-frame::before { content: '💖'; position: absolute; top: -15px; left: -15px; font-size: 30px; }
-        .cute-frame::after { content: '💖'; position: absolute; bottom: -15px; right: -15px; font-size: 30px; }
-        .gift-img { width: 230px; height: 230px; object-fit: contain; background: #fff; border-radius: 20px; }
+        /* 装饰爱心调小 */
+        .cute-frame::before { content: '💖'; position: absolute; top: -12px; left: -12px; font-size: 20px; }
+        .cute-frame::after { content: '💖'; position: absolute; bottom: -12px; right: -12px; font-size: 20px; }
+        
+        .gift-img { 
+            width: 100%;              /* 随外框宽度自适应 */
+            max-width: 180px;         /* 图片不宜过大 */
+            height: auto;
+            aspect-ratio: 1/1;
+            object-fit: contain; 
+            background: #fff; 
+            border-radius: 12px; 
+        }
         
         .show-result .cute-frame { opacity: 1; transform: scale(1); }
-        .gift-name { font-size: 26px; font-weight: bold; color: #ff477e; margin-bottom: 10px; }
-        .gift-desc { font-size: 15px; line-height: 1.6; padding: 0 30px; font-weight: bold; }
+        .gift-name { font-size: 22px; font-weight: bold; color: #ff477e; margin-bottom: 8px; }
+        .gift-desc { font-size: 13px; line-height: 1.5; padding: 0 15px; font-weight: bold; }
 
-        /* 弹窗 */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,175,189,0.5); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.4s; z-index: 100; }
         .overlay.active { opacity: 1; pointer-events: auto; }
     </style>
@@ -154,15 +156,14 @@
     <div id="bg-container"></div>
 
     <div id="phase1" class="screen">
-        <div class="glass-panel" style="padding: 50px 30px; width: 85%;">
-            <h1 style="margin-bottom:40px; font-family:serif;">公主请开启<br>你的专属礼物</h1>
+        <div class="glass-panel" style="padding: 40px 20px; width: 80%;">
+            <h1 style="margin-bottom:30px; font-size: 24px; font-family:serif;">公主请开启<br>你的专属礼物</h1>
             <button class="btn" onclick="goPhase2()">进入抽奖 ✨</button>
         </div>
     </div>
 
     <div id="phase2" class="screen fade-out">
-        <div style="font-size: 18px; margin-bottom: 40px; font-weight: bold;">点击解开丝带，开启惊喜</div>
-        
+        <div style="font-size: 16px; margin-bottom: 30px; font-weight: bold;">点击解开丝带，开启惊喜</div>
         <div class="flat-box-stage" onclick="openBox()">
             <div id="flat-box" class="flat-box flat-box-float">
                 <div id="lid" class="box-lid">
@@ -176,29 +177,28 @@
                 <div class="inner-light" id="inner-light"></div>
             </div>
         </div>
-
         <button id="openBtn" class="btn" onclick="openBox()">✨ 开启惊喜</button>
     </div>
 
     <div id="phase3" class="screen fade-out">
-        <div id="result-ui" style="text-align: center;">
+        <div id="result-ui" style="text-align: center; display: flex; flex-direction: column; align-items: center;">
             <div class="cute-frame">
                 <img id="gift-img" class="gift-img" src="" alt="礼物">
             </div>
             <div id="gift-name" class="gift-name"></div>
             <div id="gift-desc" class="gift-desc"></div>
             
-            <div style="margin-top: 40px; display: flex; flex-direction: column; align-items: center; gap: 15px;">
+            <div style="margin-top: 25px; display: flex; flex-direction: column; align-items: center; gap: 12px;">
                 <button class="btn" onclick="showPopup()">🎁 立即领取</button>
-                <div style="font-size: 13px; text-decoration: underline; cursor: pointer;" onclick="retry()">不喜欢？重抽一次</div>
+                <div style="font-size: 12px; text-decoration: underline; cursor: pointer;" onclick="retry()">不喜欢？重抽一次</div>
             </div>
         </div>
     </div>
 
     <div id="popup-overlay" class="overlay">
-        <div class="glass-panel" style="padding: 40px 25px; width: 85%;">
-            <h2 style="color:#ff477e; margin-bottom:15px;">请联系亲爱的老公<br>领取实物哦！💕</h2>
-            <p style="font-size:13px; color:#ff8fa3; margin-bottom:25px; border-top:1px solid #ffe4e8; padding-top:15px;">
+        <div class="glass-panel" style="padding: 30px 20px; width: 80%;">
+            <h2 style="color:#ff477e; font-size: 18px; margin-bottom:12px;">请联系亲爱的老公<br>领取实物哦！💕</h2>
+            <p style="font-size:12px; color:#ff8fa3; margin-bottom:20px; border-top:1px solid #ffe4e8; padding-top:10px;">
                 备注：可多次抽取。若无心仪之选，请即刻召唤老公更新礼物池。
             </p>
             <button class="btn" style="width: 100%;" onclick="closePopup()">爱你 😘</button>
@@ -249,16 +249,13 @@
             box.classList.remove('flat-box-float');
             document.getElementById('openBtn').innerText = "丝带解开中...";
 
-            // 1. 丝带和蝴蝶结平滑解开/消失
             ribbonsV.forEach(r => r.classList.add('ribbon-unfold-v'));
             ribbonsH.forEach(r => r.classList.add('ribbon-unfold-h'));
             bow.classList.add('bow-unfold');
 
-            // 2. 盒盖飞起，光芒亮起
             lid.classList.add('lid-open');
             light.style.opacity = "1";
 
-            // 3. 展现结果
             setTimeout(() => {
                 const gift = gifts[Math.floor(Math.random()*gifts.length)];
                 const img = document.getElementById('gift-img');
@@ -274,10 +271,7 @@
             }, 1500);
         }
 
-        function retry() {
-            location.reload(); 
-        }
-
+        function retry() { location.reload(); }
         function showPopup() { document.getElementById('popup-overlay').classList.add('active'); }
         function closePopup() { document.getElementById('popup-overlay').classList.remove('active'); }
     </script>
